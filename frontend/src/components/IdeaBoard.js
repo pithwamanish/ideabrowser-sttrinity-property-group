@@ -47,7 +47,7 @@ const IdeaBoard = () => {
     try {
       await axios.post(`${API}/ideas`, { text: newIdea.trim() });
       setNewIdea('');
-      await fetchIdeas(); // Refresh the list
+      await fetchIdeas(false); // Refresh the list immediately
       toast.success('Your idea has been shared! 🎉');
     } catch (error) {
       console.error('Error submitting idea:', error);
@@ -64,7 +64,7 @@ const IdeaBoard = () => {
     setUpvotingIds(prev => new Set([...prev, ideaId]));
     try {
       await axios.patch(`${API}/ideas/${ideaId}/upvote`);
-      await fetchIdeas(); // Refresh to get updated counts
+      await fetchIdeas(false); // Refresh to get updated counts immediately
       toast.success('Upvoted! ❤️');
     } catch (error) {
       console.error('Error upvoting idea:', error);
