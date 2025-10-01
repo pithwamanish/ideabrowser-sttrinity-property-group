@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  # Production Frontend with Nginx
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+    container_name: ideaboard_frontend_prod
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    environment:
+      - NODE_ENV=production
+    depends_on:
+      - backend
+    networks:
+      - ideaboard_network
+
+  # Backend with production settings
+  backend:
+    environment:
+      - MONGO_URL=mongodb://mongodb:27017
+      - DB_NAME=ideaboard_prod
+      - CORS_ORIGINS=http://localhost,https://yourdomain.com
+    command: uvicorn server:app --host 0.0.0.0 --port 8000 --workers 2
+
+  # MongoDB for production
+  mongodb:
+    environment:
+      MONGO_INITDB_DATABASE: ideaboard_prod
+    volumes:
+      - mongodb_prod_data:/data/db
+
+volumes:
+  mongodb_prod_data:
+    driver: local
+
+networks:
+  ideaboard_network:
+    driver: bridge
