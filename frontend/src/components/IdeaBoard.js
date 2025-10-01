@@ -24,15 +24,17 @@ const IdeaBoard = () => {
   const remainingChars = characterLimit - newIdea.length;
 
   // Fetch ideas from the API
-  const fetchIdeas = async () => {
+  const fetchIdeas = async (showLoadingSpinner = false) => {
     try {
+      if (showLoadingSpinner) setIsLoading(true);
       const response = await axios.get(`${API}/ideas`);
       setIdeas(response.data);
+      setLastUpdate(new Date());
     } catch (error) {
       console.error('Error fetching ideas:', error);
       toast.error('Failed to load ideas. Please try again.');
     } finally {
-      setIsLoading(false);
+      if (showLoadingSpinner) setIsLoading(false);
     }
   };
 
