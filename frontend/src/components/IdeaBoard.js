@@ -137,6 +137,11 @@ const IdeaBoard = () => {
                 Live
               </Badge>
               <span className="text-sm text-gray-600">{ideas.length} ideas shared</span>
+              {isPolling && (
+                <span className="text-xs text-gray-500">
+                  Updated {formatDate(lastUpdate)}
+                </span>
+              )}
             </div>
           </div>
         </div>
