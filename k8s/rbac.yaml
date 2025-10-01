@@ -1,0 +1,99 @@
+# ServiceAccount for the application
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ideaboard-service-account
+  namespace: ideaboard
+  labels:
+    app: ideaboard
+
+---
+# Role for the application (if RBAC is needed)
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: ideaboard-role
+  namespace: ideaboard
+rules:
+- apiGroups: [""]
+  resources: ["configmaps", "secrets"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list"]
+
+---
+# RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ideaboard-role-binding
+  namespace: ideaboard
+subjects:
+- kind: ServiceAccount
+  name: ideaboard-service-account
+  namespace: ideaboard
+roleRef:
+  kind: Role
+  name: ideaboard-role
+  apiGroup: rbac.authorization.k8s.io
+
+---
+# ServiceMonitor for Prometheus (if using Prometheus monitoring)
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: ideaboard-backend-monitor
+  namespace: ideaboard
+  labels:
+    app: backend
+spec:
+  selector:
+    matchLabels:
+      app: backend
+  endpoints:
+  - port: http
+    path: /metrics  # If you add metrics endpoint to FastAPI
+    interval: 30s
+    scrapeTimeout: 10s
+
+---
+# Resource Quotas for the namespace
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: ideaboard-quota
+  namespace: ideaboard
+spec:
+  hard:
+    requests.cpu: "4"
+    requests.memory: 8Gi
+    limits.cpu: "8"
+    limits.memory: 16Gi
+    persistentvolumeclaims: "3"
+    services: "10"
+    secrets: "10"
+    configmaps: "10"
+
+---
+# LimitRange for pods
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: ideaboard-limit-range
+  namespace: ideaboard
+spec:
+  limits:
+  - default:
+      cpu: "500m"
+      memory: "512Mi"
+    defaultRequest:
+      cpu: "100m"
+      memory: "128Mi"
+    max:
+      cpu: "2"
+      memory: "2Gi"
+    min:
+      cpu: "50m"
+      memory: "64Mi"
+    type: Container

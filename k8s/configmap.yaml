@@ -1,0 +1,92 @@
+# Secret for TLS certificates (if not using cert-manager)
+apiVersion: v1
+kind: Secret
+metadata:
+  name: ideaboard-tls-secret
+  namespace: ideaboard
+type: kubernetes.io/tls
+data:
+  # Base64 encoded TLS certificate and key
+  # Replace with actual certificate data
+  tls.crt: LS0tLS1CRUdJTi...
+  tls.key: LS0tLS1CRUdJTi...
+
+---
+# Secret for database credentials (if needed)
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mongodb-secret
+  namespace: ideaboard
+type: Opaque
+data:
+  # Base64 encoded values
+  # echo -n 'username' | base64
+  # echo -n 'password' | base64
+  mongodb-root-username: YWRtaW4=  # admin
+  mongodb-root-password: cGFzc3dvcmQ=  # password
+
+---
+# Secret for API keys or tokens
+apiVersion: v1
+kind: Secret
+metadata:
+  name: app-secrets
+  namespace: ideaboard
+type: Opaque
+data:
+  # Add any API keys or sensitive configuration here
+  # jwt-secret: base64EncodedJWTSecret
+  # api-key: base64EncodedAPIKey
+
+---
+# ConfigMap for Nginx configuration (if using custom nginx)
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config
+  namespace: ideaboard
+data:
+  nginx.conf: |
+    upstream backend {
+        server backend-service:8000;
+    }
+    
+    server {
+        listen 80;
+        server_name _;
+        
+        # Frontend routes
+        location / {
+            proxy_pass http://frontend-service:3000;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+        
+        # API routes
+        location /api/ {
+            proxy_pass http://backend/;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            
+            # CORS headers
+            add_header Access-Control-Allow-Origin *;
+            add_header Access-Control-Allow-Methods "GET, POST, PATCH, PUT, DELETE, OPTIONS";
+            add_header Access-Control-Allow-Headers "*";
+            
+            if ($request_method = 'OPTIONS') {
+                return 204;
+            }
+        }
+        
+        # Health check
+        location /health {
+            access_log off;
+            return 200 "healthy\n";
+            add_header Content-Type text/plain;
+        }
+    }
