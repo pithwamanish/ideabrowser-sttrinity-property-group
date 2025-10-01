@@ -17,6 +17,8 @@ const IdeaBoard = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [upvotingIds, setUpvotingIds] = useState(new Set());
+  const [lastUpdate, setLastUpdate] = useState(new Date());
+  const [isPolling, setIsPolling] = useState(true);
 
   const characterLimit = 280;
   const remainingChars = characterLimit - newIdea.length;
