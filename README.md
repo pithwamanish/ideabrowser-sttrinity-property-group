@@ -251,6 +251,40 @@ curl -X PATCH http://localhost:8000/api/ideas/{id}/upvote
 - **Desktop**: 1024px+
 - **Large**: 1920px+
 
+### Real-Time Multi-User Experience
+
+The Idea Board provides a truly **live, collaborative experience** where multiple users can interact simultaneously and see each other's actions in real-time.
+
+**How it works:**
+- **Periodic Polling**: App automatically polls the server every 5 seconds
+- **Background Updates**: Changes from other users appear seamlessly without page refresh
+- **Immediate Feedback**: Your own actions (submit/upvote) trigger instant updates
+- **Live Indicators**: Visual status showing "Live" connection and last update time
+- **Smart Performance**: Polling doesn't interfere with user interactions
+
+**Multi-User Scenarios:**
+- User A upvotes an idea → User B sees the new vote count within 5 seconds
+- User C submits a new idea → All other users see it appear in their grid within 5 seconds  
+- Ideas automatically re-sort based on community votes across all users
+- Real-time idea count updates in the header for all connected users
+
+**Technical Implementation:**
+```javascript
+useEffect(() => {
+  // Initial load
+  fetchIdeas(true);
+  
+  // Set up periodic polling for real-time updates
+  const pollInterval = setInterval(() => {
+    fetchIdeas(false); // Silent background updates
+  }, 5000);
+  
+  return () => clearInterval(pollInterval);
+}, []);
+```
+
+This approach provides the **"live" feel** required while being simple, reliable, and server-friendly compared to WebSocket implementations.
+
 ## 🚀 Deployment Considerations
 
 ### Environment Variables
