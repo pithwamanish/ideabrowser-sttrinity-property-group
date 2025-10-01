@@ -1,0 +1,22 @@
+# Development Environment
+# Docker Compose Override for Development
+version: '3.8'
+
+services:
+  backend:
+    environment:
+      - MONGO_URL=mongodb://mongodb:27017
+      - DB_NAME=ideaboard_dev
+      - CORS_ORIGINS=http://localhost:3000,http://frontend:3000
+    volumes:
+      - ./backend:/app
+    command: uvicorn server:app --host 0.0.0.0 --port 8000 --reload
+
+  frontend:
+    environment:
+      - REACT_APP_BACKEND_URL=http://localhost:8000
+      - CHOKIDAR_USEPOLLING=true
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    command: yarn start
