@@ -1,24 +1,35 @@
 # The Idea Board Platform
 
-A modern, two-part web application featuring a marketing landing page and a collaborative idea sharing platform where users can submit ideas, upvote concepts, and discover innovative thinking from the community.
+A modern, real-time, two-part web application featuring a marketing landing page and a collaborative idea sharing platform where multiple users can simultaneously submit ideas, upvote concepts, and see live updates from the community in real-time.
 
 ## 🚀 Features
 
 ### Landing Page
 - **Professional Design**: Modern hero section with compelling copy and visual hierarchy
-- **Feature Highlights**: Four key features showcasing platform capabilities
+- **Feature Highlights**: Four key features showcasing platform capabilities  
 - **Responsive Layout**: Fully responsive design optimized for desktop and mobile
 - **Clear CTAs**: Strategic call-to-action buttons driving users to the main application
 
-### Idea Board Application
+### Idea Board Application - **REAL-TIME MULTI-USER**
 - **Idea Submission**: Clean form interface with 280-character limit and real-time character counting
 - **Community Voting**: Upvote system allowing users to promote the best ideas
 - **Smart Sorting**: Ideas automatically sorted by upvote count for maximum visibility
-- **Real-time Updates**: Live data refreshing after submissions and votes
+- **🔴 LIVE REAL-TIME UPDATES**: Multiple users see each other's actions in real-time
+  - **Periodic Polling**: App polls server every 5 seconds for live updates
+  - **Multi-User Sync**: When User A upvotes, User B sees the update within 5 seconds
+  - **Live Indicators**: Visual "Live" indicator and last update timestamps
+  - **Seamless UX**: Updates happen in background without disrupting user experience
 - **Anonymous Sharing**: No registration required - instant participation
 - **Responsive Grid**: Mobile-friendly card layout adapting to all screen sizes
 
 ## 🏗️ Technical Architecture
+
+### Real-Time Implementation
+The application implements **periodic polling** for real-time multi-user experience:
+- **Polling Interval**: 5 seconds for optimal balance between responsiveness and server load
+- **Smart Updates**: Silent background polling doesn't interrupt user interactions  
+- **Immediate Actions**: User's own actions (submit/upvote) trigger immediate updates
+- **Visual Feedback**: Live status indicators show connection and last update time
 
 ### Frontend
 - **Framework**: React 19.0.0
@@ -27,6 +38,7 @@ A modern, two-part web application featuring a marketing landing page and a coll
 - **Routing**: React Router DOM for SPA navigation
 - **HTTP Client**: Axios for API communication
 - **Notifications**: Sonner for toast notifications
+- **Real-time**: Periodic polling with useEffect and setInterval
 
 ### Backend
 - **Framework**: FastAPI 0.110.1 (Python)
@@ -34,15 +46,16 @@ A modern, two-part web application featuring a marketing landing page and a coll
 - **API Design**: RESTful architecture with proper HTTP status codes
 - **Data Validation**: Pydantic models for request/response validation
 - **CORS**: Configured for cross-origin requests
+- **Performance**: Optimized queries with proper sorting
 
 ### Database Schema
 ```javascript
 // Ideas Collection
 {
-  "id": "uuid-string",
-  "text": "string (max 280 chars)",
-  "upvotes": "integer",
-  "created_at": "ISO datetime"
+  "id": "uuid-string",           // UUID for API usage
+  "text": "string (max 280 chars)", // Idea content
+  "upvotes": "integer",          // Vote count
+  "created_at": "ISO datetime"   // Timestamp
 }
 ```
 
