@@ -93,6 +93,14 @@ const IdeaBoard = () => {
 
   useEffect(() => {
     fetchIdeas();
+    
+    // Set up periodic polling for real-time updates from other users
+    const pollInterval = setInterval(() => {
+      fetchIdeas();
+    }, 5000); // Poll every 5 seconds for live updates
+    
+    // Cleanup interval on component unmount
+    return () => clearInterval(pollInterval);
   }, []);
 
   return (
